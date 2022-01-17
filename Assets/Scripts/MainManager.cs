@@ -4,13 +4,17 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
 public class MainManager : MonoBehaviour
 {
+    public static MainManager instance;
+
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text highScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -18,13 +22,21 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+
     // Start is called before the first frame update
+    private void Awake()
+    {
+            instance = this;
+        UpdateHighscore();
+    }
+
     void Start()
     {
+        highScoreText.text = DataManager.dataInstance.highscorer + " - " + DataManager.dataInstance.highscore;
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
+
         int[] pointCountArray = new [] {1,1,2,2,5,5};
         for (int i = 0; i < LineCount; ++i)
         {
@@ -60,6 +72,8 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
+
     }
 
     void AddPoint(int point)
@@ -72,5 +86,15 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
-    }
+        UpdateHighscore();
+    } 
+    public void UpdateHighscore()
+        {
+            if (m_Points > DataManager.dataInstance.highscore)
+            {
+            DataManager.dataInstance.highscore = m_Points;
+            DataManager.dataInstance.highscorer = DataManager.dataInstance.currentPlayer;
+            highScoreText.text = DataManager.dataInstance.highscorer + " - " + DataManager.dataInstance.highscore;
+            }
+        }
 }
